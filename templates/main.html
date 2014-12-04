@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>iCoop Control Center</title>
+    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css'>
+</head>
+<body>
+    <div class='container'>
+        <div class='row'>
+            <div class='col-sm-3'>
+                <h1 class='text-center'>iCoop Control Center<br/><small>Brainerd Bros</small></h1>
+            </div>
+            <div class='col-sm-8'>
+                <div id='chart' style='width: 100%; height: 100%;'></div>
+            </div>
+        </div>      
+        <div class='row'>
+            <form class='form-horizontal' role='form'>
+                <div class='form-group'>
+                    <label for='lightLevel' class='col-sm-6 control-label'>The current light level is</label>
+                    <div class='col-sm-3'><input type='email' class='form-control' id='lightLevel' disabled></div>
+                </div>
+                <div class='form-group'>
+                    <div class='col-sm-2'></div>
+                    <div class='col-sm-8 alert alert-warning text-center' role='alert' id='doorStatus'></div>
+                    <div class='col-sm-2'></div>
+                </div>
+                <div class='form-group'>
+                    <label for='input3' class='col-sm-6 control-label'>I command the door to be</label>
+                    <div class='col-sm-6 btn-group' id='input3'>
+                        <button type='button' class='btn btn-primary' id='mode_auto'>Automatic</button>
+                        <button type='button' class='btn btn-warning' id='mode_opened'>Opened</button>
+                        <button type='button' class='btn btn-success' id='mode_closed'>Closed</button>
+                    </div>
+                </div>
+                <div class='form-group'>
+                    <label for='openLightLevel' class='col-sm-6 control-label'>Open the door when the light level rises above</label>
+                    <div class='col-sm-3'><input type='text' class='form-control' id='edit_open_light_level' placeholder='0 - 1000'></div>
+                    <div class='col-sm-1'><button type='button' id='set_open_light_level' class='btn btn-primary'>Set</button></div>
+                </div>
+                <div class='form-group'>
+                    <label for='closeLightLevel' class='col-sm-6 control-label'>Close the door when the light level falls below</label>
+                    <div class='col-sm-3'><input type='text' class='form-control' id='edit_close_light_level' placeholder='0 - 1000'></div>
+                    <div class='col-sm-1'><button type='button' id='set_close_light_level' class='btn btn-primary'>Set</button></div>
+                </div>
+                <div class='form-group'>
+                    <label for='lightLevel' class='col-sm-6 control-label'>The current temperature is</label>
+                    <div class='col-sm-3'><input type='email' class='form-control' id='temp' disabled></div>
+                </div>
+                <div class='form-group'>
+                    <label for='openLightLevel' class='col-sm-6 control-label'>Turn on the fan when the temperature rises above</label>
+                    <div class='col-sm-3'><input type='text' class='form-control' id='edit_fan_temp' placeholder='0 - 100'></div>"
+                    <div class='col-sm-1'><button type='button' id='set_fan_temp' class='btn btn-primary'>Set</button></div>
+                </div>
+            </form>
+        </div>
+        <div class='row'>
+        <div class='col-sm-12 text-center'><small>Powered by Raspberry Pi</small></div>
+        </div>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>  
+        function getStatus() {
+            $.get('/status', function(data) {
+                $('#lightLevel').val(data.light_level);
+                if ($('#edit_open_light_level').val() == '') $('#edit_open_light_level').val(data.open_light_level);
+                if ($('#edit_close_light_level').val() == '') $('#edit_close_light_level').val(data.close_light_level);
+                $('#temp').val(data.temp);
+                if ($('#edit_fan_temp').val() == '') $('#edit_fan_temp').val(data.fan_temp);
+                $('#doorStatus').text(data.door_status);
+                $('[id^=mode]').removeClass('active');
+                $('#mode_'+data.door_mode).addClass('active');
+            }, 'json');
+        }
+        getStatus();
+        $('[id^=mode_]').click(function() {
+            $.get('/set_mode='+event.target.id.substring(5), function() {
+                getStatus();
+            });
+        });
+        $(function() {window.setInterval(getStatus, 10000)});
+        $('[id^=edit_]').focus(function() {
+            $('#set_'+this.id.substring(5)).fadeIn(500);
+        });
+        $('[id^=edit_]').focusout(function() {
+            $('#set_'+this.id.substring(5)).fadeOut(500);
+        });
+        $('[id^=set_]').hide();
+        $('[id^=set_]').click(function() {
+            $.get('/'+event.target.id+'='+$('#edit_'+event.target.id.substring(4)).val());
+            $(this).fadeOut(500);
+        });  
+        google.load('visualization', '1', {packages:['corechart']});
+        google.setOnLoadCallback(getHistory);
+        function getHistory() {
+            $.get('/history', function(data) {
+                var table = google.visualization.arrayToDataTable(data.table);
+                var chart = new google.visualization.LineChart(document.getElementById('chart'));
+                chart.draw(table, {});
+            }, 'json');
+        }
+    </script>
+</body>
+</html>
