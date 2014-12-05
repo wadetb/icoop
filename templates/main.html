@@ -5,8 +5,8 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>iCoop Control Center</title>
-    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css'>
-    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css'>
+    <link rel='stylesheet' href='/static/bootstrap.min.css'>
+    <link rel='stylesheet' href='/static/bootstrap-theme.min.css'>
 </head>
 <body>
     <div class='container'>
@@ -26,15 +26,15 @@
                 </div>
                 <div class='form-group'>
                     <div class='col-sm-2'></div>
-                    <div class='col-sm-8 alert alert-warning text-center' role='alert' id='doorStatus'></div>
+                    <div class='col-sm-8 alert alert-warning text-center' role='alert' id='doorStatus'>...</div>
                     <div class='col-sm-2'></div>
                 </div>
                 <div class='form-group'>
                     <label for='input3' class='col-sm-6 control-label'>I command the door to be</label>
                     <div class='col-sm-6 btn-group' id='input3'>
                         <button type='button' class='btn btn-primary' id='mode_auto'>Automatic</button>
-                        <button type='button' class='btn btn-warning' id='mode_opened'>Opened</button>
-                        <button type='button' class='btn btn-success' id='mode_closed'>Closed</button>
+                        <button type='button' class='btn btn-warning' id='mode_open'>Opened</button>
+                        <button type='button' class='btn btn-success' id='mode_close'>Closed</button>
                     </div>
                 </div>
                 <div class='form-group'>
@@ -62,9 +62,8 @@
         <div class='col-sm-12 text-center'><small>Powered by Raspberry Pi</small></div>
         </div>
     </div>
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
-    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script src='/static/jquery.min.js'></script>
+    <script src='/static/bootstrap.min.js'></script>
     <script type='text/javascript'>  
         function getStatus() {
             $.get('/status', function(data) {
@@ -95,7 +94,10 @@
         $('[id^=set_]').click(function() {
             $.get('/'+event.target.id+'='+$('#edit_'+event.target.id.substring(4)).val());
             $(this).fadeOut(500);
-        });  
+        }); 
+    </script>
+    <!--<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script type='text/javascript'>  
         google.load('visualization', '1', {packages:['corechart']});
         google.setOnLoadCallback(getHistory);
         function getHistory() {
@@ -105,6 +107,6 @@
                 chart.draw(table, {});
             }, 'json');
         }
-    </script>
+    </script>-->
 </body>
 </html>
