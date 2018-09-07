@@ -1,1 +1,2 @@
-icoop.db
+*.db
+*.log

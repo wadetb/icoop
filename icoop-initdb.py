@@ -45,17 +45,22 @@ with sqlite3.connect('icoop.db') as db:
 
     dbc.execute('DROP TABLE settings')
     dbc.execute('DROP TABLE status')
+    dbc.execute('DROP TABLE history')
+    dbc.execute('VACUUM')
 
     dbc.execute('''CREATE TABLE settings 
-                   (settings text, ts DEFAULT (CURRENT_TIMESTAMP))''')
+                   (settings text, ts PRIMARY_KEY DEFAULT (datetime('now')))''')
 
     dbc.execute("INSERT INTO settings (settings) VALUES (?)", 
                (json.dumps(settings),))
 
     dbc.execute('''CREATE TABLE status 
-                   (door text, light real, temp real, humidity real, ts DEFAULT (CURRENT_TIMESTAMP))''')
+                   (door text, light real, temp real, humidity real, ts PRIMARY_KEY DEFAULT (datetime('now')))''')
 
     dbc.execute("INSERT INTO status (door, light, temp, humidity) VALUES (?, ?, ?, ?)", 
-               ('auto', 0, 0, 0))
+               ('unknown', 0, 0, 0))
+
+    dbc.execute('''CREATE TABLE history 
+                   (door text, light real, temp real, humidity real, ts PRIMARY_KEY DEFAULT (datetime('now')))''')
 
     dbc.close()

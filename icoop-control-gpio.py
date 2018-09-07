@@ -107,7 +107,6 @@ def open_door():
 
     GPIO.output(MOTOR_OPEN_PIN, GPIO.LOW)
 
-    status['door'] = 'open';
     report_status()
  
 def close_door():
@@ -131,9 +130,10 @@ def close_door():
             break
 
     GPIO.output(MOTOR_CLOSE_PIN, GPIO.LOW)
+
     report_status()
 
-print "iCoop Control Daemon"
+print "iCoop GPIO Control Daemon"
 print "Press Ctrl-C to exit."
 
 load_settings()
